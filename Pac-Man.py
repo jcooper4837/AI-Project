@@ -42,9 +42,13 @@ board = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 
 pacX = 13*mult + int(mult/2)
 pacY = 23*mult + int(mult/2)
+dirX = 0
+dirY = 0
+bufX = 0
+bufY = 0
 pacman = pygame.draw.circle(screen,(255,255,0),(pacX,pacY),8)
 
-def update(mX,mY):
+def update():
     screen.fill((0,0,0))
     for i in range(0,x,mult):
         for j in range(0,y,mult):
@@ -66,15 +70,34 @@ def update(mX,mY):
         for j in range(0,y,mult):
             p = board[int(j/mult)][int(i/mult)]
             if p == 4:
-                if board[int(j/mult+mY)][int(i/mult+mX)] != 1:
-                    global pacX
-                    global pacY
-                    pacX = pacX + mX
-                    pacY = pacY + mY
+                global dirX
+                global dirY
+                global bufX
+                global bufY
+                global pacX
+                global pacY
+                #print(pacX,pacY)
+                if (int(i/mult+bufX) < 28 and int(i/mult+bufX) > 0 and
+                    board[int(j/mult+bufY)][int(i/mult+bufX)] != 1 and
+                    pacX % mult == int(mult/2) and
+                    pacY % mult == int(mult/2)):
+                    dirX = bufX
+                    dirY = bufY
+                if board[int(j/mult+dirY)][int(i/mult+dirX)] != 1:
+                    pacX = pacX + dirX
+                    pacY = pacY + dirY
                     if (pacX % mult == int(mult/2) and
                         pacY % mult == int(mult/2)):
                         board[int(j/mult)][int(i/mult)] = 0
-                        board[int(j/mult+mY)][int(i/mult+mX)] = 4
+                        board[int(j/mult+dirY)][int(i/mult+dirX)] = 4
+                        if int(i/mult+dirX) == 27:
+                            board[int(j/mult+dirY)][int(i/mult+dirX)] = 0
+                            board[int(j/mult+dirY)][1] = 4
+                            pacX = pacX - 26*mult
+                        elif int(i/mult+dirX) == 0:
+                            board[int(j/mult+dirY)][int(i/mult+dirX)] = 0
+                            board[int(j/mult+dirY)][26] = 4
+                            pacX = pacX + 26*mult
                 pygame.draw.circle(screen,(255,255,0),(pacX,pacY),8)
                 #print(int(j/mult),int(i/mult))
                 return
@@ -82,10 +105,8 @@ def update(mX,mY):
             #pygame.display.flip()
             #time.sleep(.001)
 
-update(0,0)
+update()
 
-dirX = 0
-dirY = 0
 counter = 0
 running = True
 while running:
@@ -95,23 +116,23 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                dirX = 0
-                dirY = -1
+                bufX = 0
+                bufY = -1
             elif event.key == pygame.K_a:
-                dirX = -1
-                dirY = 0
+                bufX = -1
+                bufY = 0
             elif event.key == pygame.K_s:
-                dirX = 0
-                dirY = 1
+                bufX = 0
+                bufY = 1
             elif event.key == pygame.K_d:
-                dirX = 1
-                dirY = 0
+                bufX = 1
+                bufY = 0
             
     #screen.fill((255,255,255))
 
     counter = counter + 1
     if counter > 30:
-        update(dirX,dirY)
+        update()
         counter = 0
     pygame.display.flip()
 

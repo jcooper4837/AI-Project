@@ -150,6 +150,7 @@ class Pacman:
         global reset
         global score
         global wins
+        global highScore
         found = False
         for i in range(0,x,mult):
             for j in range(0,y,mult):
@@ -209,8 +210,10 @@ class Pacman:
                         #running = False
                         #pygame.quit()
                         reset = True
+                        if score > highScore:
+                            highScore = score
                         score = 0
-                        wins = 0
+                        wins = 0                      
                         return
                     if not any(2 in x for x in board):
                         #print("You win!")
@@ -405,27 +408,27 @@ while running:
                 blinky.color = (255,0,0)
                 pinky.color = (255,184,255)
                 clyde.color = (255,184,82)
-    score = (wins * 241) + countScore()
-    if score < 0:
-        score = 0
-    if score > highScore:
-        highScore = score
-    outScore = "Score: " + str(score) + "     Highscore: " + str(highScore)
-    text = font.render(outScore,True,(255,255,255))
-    textRect = text.get_rect()
-    textRect.center = (x/2,y+(mult/2))
-    screen.blit(text,textRect)
-    #print(score)
+        old = score
+        score = (wins * 241) + countScore()
+        if score < old:
+            score = old
+        outScore = "Score: " + str(score) + "     Highscore: " + str(highScore)
+        text = font.render(outScore,True,(255,255,255))
+        textRect = text.get_rect()
+        textRect.center = (x/2,y+(mult/2))
+        screen.blit(text,textRect)
+        #print(score)
     
-    if reset == True:
-        reset = False
-        pacman = Pacman(5)
-        inky = Pacman(6)
-        blinky = Pacman(7)
-        pinky = Pacman(8)
-        clyde = Pacman(9)
-        resetBoard()
-        updateBoard()
+        if reset == True:
+            score = 0
+            reset = False
+            pacman = Pacman(5)
+            inky = Pacman(6)
+            blinky = Pacman(7)
+            pinky = Pacman(8)
+            clyde = Pacman(9)
+            resetBoard()
+            updateBoard()
     if counter > 999999999:
         counter = 0
     pygame.display.flip()
